@@ -186,7 +186,7 @@ for (let i = 0; i < bookoflife.length; i++) {
 Object.keys(images).forEach(i => {
     images[i] = Object.assign(
         document.createElement("img"),
-        { src: `${i}.png` }
+        { src: `./images/${i}.png` }
     );
 });
 
