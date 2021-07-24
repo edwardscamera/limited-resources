@@ -1,3 +1,7 @@
+v1.1.1 - 7/24/21
+    - removed unnecessary code from "script.js"
+    - moved some code in "script.js"
+
 v1.1.0 - 7/24/21
     - added changelog.txt
     - separated sphere recipes into separate file "./bookoflife.js"

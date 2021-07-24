@@ -1,5 +1,3 @@
-// test fork
-
 const CANVAS = document.querySelector("#chungus");
 const CTX = CANVAS.getContext("2d");
 
@@ -10,6 +8,7 @@ let waterMade = 0;
 let fireMade = 0;
 
 let initcombo = 1;
+let advnum = 0;
 
 const url_settings = window.location.href.split("?").length > 1 ? window.location.href.split("?")[1] : "";
 
@@ -28,9 +27,7 @@ const adv = [
     "flag": false,
 }));
 
-let advnum = 0;
-
-images = {
+const images = {
     "energy": null,
     "water": null,
     "fire": null,
@@ -65,6 +62,17 @@ const tree_objects = [
     },
 ];
 
+const camera = {
+    x: window.innerWidth / -2,
+    y: window.innerHeight / -2,
+    velx: 0,
+    vely: 0,
+    mouseDown: false,
+    rightDown: false,
+    mouseX: 0,
+    mouseY: 0,
+}
+
 if (url_settings.includes("debug=true")) for (let i = 0; i < Object.keys(images).length; i++) {
     tree_objects.push({
         x: i * 150,
@@ -88,23 +96,6 @@ if (url_settings.includes("debug=true")) for (let i = 0; i < Object.keys(images)
     });
 }
 
-const camera = {
-    x: window.innerWidth / -2,
-    y: window.innerHeight / -2,
-    velx: 0,
-    vely: 0,
-    mouseDown: false,
-    rightDown: false,
-    mouseX: 0,
-    mouseY: 0,
-}
-
-const inv = {};
-
-window.onresize = () => {
-    CANVAS.width = window.innerWidth;
-    CANVAS.height = window.innerHeight;
-};
 const update = () => {
     CTX.fillStyle = "#ffffff";
     CTX.fillRect(0, 0, CANVAS.width, CANVAS.height);
@@ -115,13 +106,7 @@ const update = () => {
     camera.y += camera.vely;
 
     for (let i = 0; i < tree_objects.length; i++) {
-        if (Math.sqrt(
-            (tree_objects[i].x - camera.x - camera.mouseX) ** 2 + (tree_objects[i].y - camera.y - camera.mouseY) ** 2
-        ) < 15) {
-            tree_objects[i].shaded = true;
-        } else {
-            tree_objects[i].shaded = false;
-        }
+        tree_objects[i].shaded = Math.sqrt((tree_objects[i].x - camera.x - camera.mouseX) ** 2 + (tree_objects[i].y - camera.y - camera.mouseY) ** 2) < 15;
 
         tree_objects[i].x += tree_objects[i].xvel;
         tree_objects[i].y += tree_objects[i].yvel;
@@ -276,17 +261,10 @@ const update = () => {
                         images: [],
                     });
                 }
-
-                if (!inv.hasOwnProperty(tree_objects[i].text)) inv[tree_objects[i].text] = 1;
-                else inv[tree_objects[i].text] += 1;
-                updateAdd();
             }
         }
         else tree_objects[i].activatedTimer = 0;
     };
-
-    items = Object.keys(inv);
-
 
     let totals = {};
     tree_objects.forEach(e => {
@@ -298,10 +276,6 @@ const update = () => {
         if (!charged.hasOwnProperty(e.text)) charged[e.text] = 0;
         if (e.charged) charged[e.text]++;
     });
-
-    for (let i = 0; i < items.length; i++) {
-        if (inv[items[i]] === 0) delete inv[items[i]];
-    }
 
     targetLength += (Object.keys(totals).length - targetLength) / 10;
 
@@ -353,20 +327,16 @@ const update = () => {
     }
     for (let i = 0; i < tree_objects.length; i++) {
         for (let j = 0; j < tree_objects.length; j++) {
-
             if (i !== j) {
                 if (Math.sqrt(
                     (tree_objects[i].x - tree_objects[j].x) ** 2 + (tree_objects[i].y - tree_objects[j].y) ** 2
                 ) < 200) {
-
                     if (tree_objects[i].charged && tree_objects[j].charged) {
                         let inputs = [tree_objects[i].text, tree_objects[j].text];
                         for (let k = 0; k < bookoflife.length; k++) {
                             if (arraysEqual(bookoflife[k].input, inputs) || arraysEqual(bookoflife[k].input, inputs.reverse())) {
                                 tree_objects[i].charged = false;
                                 tree_objects[j].charged = false;
-                                inv[inputs[0]]--;
-                                inv[inputs[1]]--;
                                 tree_objects.push({
                                     x: camera.x + window.innerWidth / 2,
                                     y: camera.y - 100,
@@ -384,25 +354,15 @@ const update = () => {
                                 if (!adv[3].flag) {
                                     adv[3].flag = true;
                                     advnum++;
-                                    setTimeout(() => {
+                                    for (let i = 1; i < 4; i++) setTimeout(() => {
                                         advnum++;
-                                    }, 5 * 1000);
-                                    setTimeout(() => {
-                                        advnum++;
-                                    }, 10 * 1000);
-                                    setTimeout(() => {
-                                        advnum++;
-                                    }, 15 * 1000);
+                                    }, i * 5000);
                                 }
                                 if (!bookoflife[k].unlocked) bookoflife[k].unlocked = true;
-                                updateAdd();
                                 return;
                             }
                         }
                     }
-
-
-
                     let dist = Math.sqrt((tree_objects[i].x - tree_objects[j].x) ** 2 + (tree_objects[i].y - tree_objects[j].y) ** 2);
                     let deg = Math.atan2(tree_objects[i].y - tree_objects[j].y, tree_objects[i].x - tree_objects[j].x) + Math.PI;
                     tree_objects[i].xvel -= (Math.cos(deg) * (200 - dist)) / 4;
@@ -411,7 +371,6 @@ const update = () => {
             }
         }
     };
-
     for (let i = 0; i < adv.length; i++) {
         CTX.fillStyle = "#000000";
         CTX.fillText(adv[i].text, window.innerWidth / 2 - CTX.measureText(adv[i].text).width / 2, adv[i].y);
@@ -419,23 +378,14 @@ const update = () => {
         adv[i].ytarget = i === advnum ? 100 : -100;
     };
 };
-
-const updateAdd = () => {
-    Array.from(document.getElementsByTagName("select")).forEach(select => {
-        while (select.children.length > 0) select.children[0].remove();
-        Object.keys(inv).forEach(i => {
-            select.appendChild(Object.assign(document.createElement("option"), {
-                innerHTML: i,
-            }));
-        });
-    });
+window.onresize = () => {
+    CANVAS.width = window.innerWidth;
+    CANVAS.height = window.innerHeight;
 };
-
 window.onmousedown = (evt) => {
     switch (evt.button) {
         case 0:
             let touched = false;
-
             for (let i = 0; i < tree_objects.length; i++) {
                 if (Math.sqrt(
                     (tree_objects[i].x - camera.x - camera.mouseX) ** 2 + (tree_objects[i].y - camera.y - camera.mouseY) ** 2
@@ -443,7 +393,6 @@ window.onmousedown = (evt) => {
                     tree_objects[i].activated = true;
                 }
             };
-
             if (!touched) {
                 camera.mouseDown = true;
                 if (!adv[0].flag) {
@@ -455,14 +404,12 @@ window.onmousedown = (evt) => {
         case 2:
             camera.rightDown = true;
             break;
-
     }
 }
 window.onmouseup = () => {
     camera.mouseDown = false;
     camera.rightDown = false;
 }
-
 window.onmousemove = (evt) => {
     camera.mouseX = evt.clientX;
     camera.mouseY = evt.clientY;
@@ -474,16 +421,12 @@ window.onload = () => {
     window.onresize();
     setInterval(update, 1000 / 60);
 };
+window.oncontextmenu = (evt) => evt.preventDefault();
 const arraysEqual = (a, b) => {
     if (a === b) return true;
-    if (a == null || b == null) return false;
-    if (a.length !== b.length) return false;
-
-
-    for (var i = 0; i < a.length; ++i) {
+    if (a == null || b == null || a.length !== b.length) return false;
+    for (let i = 0; i < a.length; i++) {
         if (a[i] !== b[i]) return false;
     }
     return true;
 }
-
-window.oncontextmenu = (evt) => evt.preventDefault();
