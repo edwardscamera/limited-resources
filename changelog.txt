@@ -1,0 +1,19 @@
+v1.1.0 - 7/24/21
+    - added changelog.txt
+    - separated sphere recipes into separate file "./bookoflife.js"
+    - added new "undefined.png" to use as a placeholder image for spheres without images
+    - "debug mode" is now a url setting instead of commented out code
+    - added 4 new spheres
+        - plant
+        - squid
+        - watermelon
+        - watermelon squidward
+
+v1.0.2 - 7/22/21
+    - removed unnecessary jquery dependancy
+
+v1.0.1 - 7/22/21
+    - moved all images to "./images/" subdirectory
+
+v1.0.0 - 7/21/21
+    - Initial Release

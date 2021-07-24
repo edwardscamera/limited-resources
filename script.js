@@ -11,6 +11,8 @@ let fireMade = 0;
 
 let initcombo = 1;
 
+const url_settings = window.location.href.split("?").length > 1 ? window.location.href.split("?")[1] : "";
+
 const adv = [
     "hold left click and drag to look around",
     "click the middle of the spheres to charge them",
@@ -32,155 +34,9 @@ images = {
     "energy": null,
     "water": null,
     "fire": null,
+    "undefined": null,
 };
 
-bookoflife = [
-    {
-        input: ["energy", "energy"],
-        text: "life",
-        delay: 10,
-    },
-    {
-        input: ["energy", "fire"],
-        text: "really hot fire",
-        delay: 10,
-    },
-    {
-        input: ["energy", "water"],
-        text: "really water-y water",
-        delay: 10,
-    },
-    {
-        input: ["water", "life"],
-        text: "fish",
-        delay: 12,
-    },
-    {
-        input: ["water", "water"],
-        text: "ocean",
-        delay: 16,
-    },
-    {
-        input: ["ocean", "life"],
-        text: "coral",
-        delay: 20,
-    },
-    {
-        input: ["fire", "water"],
-        text: "earth",
-        delay: 5,
-    },
-    {
-        input: ["earth", "water"],
-        text: "oil",
-        delay: 10,
-    },
-    {
-        input: ["life", "life"],
-        text: "human",
-        delay: 60,
-    },
-    {
-        input: ["human", "human"],
-        text: "civilization",
-        delay: 120,
-    },
-    {
-        input: ["civilization", "oil"],
-        text: "capitalism",
-        delay: 80,
-    },
-    {
-        input: ["human", "capitalism"],
-        text: "jeff bezos",
-        delay: 80,
-    },
-    {
-        input: ["fire", "ocean"],
-        text: "global warming",
-        delay: 0.25,
-    },
-    {
-        input: ["fire", "human"],
-        text: "death",
-        delay: 70,
-    },
-    {
-        input: ["global warming", "human"],
-        text: "end of days",
-        delay: 0.01,
-    },
-    {
-        input: ["death", "capitalism"],
-        text: "communism",
-        delay: 80,
-    },
-    {
-        input: ["death", "communism"],
-        text: "capitalism",
-        delay: 80,
-    },
-    {
-        input: ["communism", "human"],
-        text: "joseph stalin",
-        delay: 80,
-    },
-    {
-        input: ["capitalism", "energy"],
-        text: "technology",
-        delay: 90,
-    },
-    {
-        input: ["technology", "death"],
-        text: "artificial intelligence",
-        delay: 180,
-    },
-    {
-        input: ["artificial intelligence", "civilization"],
-        text: "death",
-        delay: 70,
-    },
-    {
-        input: ["water", "death"],
-        text: "waterboarding",
-        delay: 15,
-    },
-    {
-        input: ["waterboarding", "human"],
-        text: "death",
-        delay: 70,
-    },
-    {
-        input: ["death", "life"],
-        text: "ghost",
-        delay: 0.01,
-    },
-    {
-        input: ["human", "technology"],
-        text: "memes",
-        delay: 0.01,
-    },
-    {
-        input: ["memes", "ocean"],
-        text: "astronaut in the ocean",
-        delay: 0.01,
-    },
-    {
-        input: ["memes", "technology"],
-        text: "patrick star",
-        delay: 0.01,
-    },
-    {
-        input: ["memes", "death"],
-        text: "harambe",
-        delay: 0.01,
-    },
-    {
-        input: ["memes", "oil"],
-        text: "the united states of america",
-        delay: 0.01,
-    },
-];
 for (let i = 0; i < bookoflife.length; i++) {
     bookoflife[i].unlocked = false;
     images[bookoflife[i].text] = null;
@@ -209,15 +65,14 @@ const tree_objects = [
     },
 ];
 
-/*
-for (let i = 0; i < Object.keys(images).length; i++) {
+if (url_settings.includes("debug=true")) for (let i = 0; i < Object.keys(images).length; i++) {
     tree_objects.push({
         x: i * 150,
         y: 500,
         xvel: 0,
         yvel: 0,
         text: Object.keys(images)[i],
-        delay: 1,
+        delay: 0.01,
         seconds: 0,
         activated: false,
         activatedTimer: 0,
@@ -232,8 +87,6 @@ for (let i = 0; i < Object.keys(images).length; i++) {
         }],
     });
 }
-*/
-
 
 const camera = {
     x: window.innerWidth / -2,
@@ -309,10 +162,11 @@ const update = () => {
                 tree_objects[i].y - camera.y + (Math.sin(tree_objects[i].images[img].rev * Math.PI / 180) * tree_objects[i].images[img].outward),
             );
             CTX.rotate(tree_objects[i].images[img].rot * Math.PI / 180)
-            CTX.drawImage(
-                images[tree_objects[i].text],
-                -25, -25,
-                50, 50);
+            try {
+                CTX.drawImage(images[tree_objects[i].text], -25, -25, 50, 50);
+            } catch (e) {
+                CTX.drawImage(images["undefined"], -25, -25, 50, 50);
+            }
             CTX.restore();
             tree_objects[i].images[img].rot += tree_objects[i].images[img].rotspeed;
             tree_objects[i].images[img].rev += tree_objects[i].images[img].revspeed;
