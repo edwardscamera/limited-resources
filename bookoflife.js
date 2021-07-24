@@ -268,7 +268,7 @@ const bookoflife = [
             "human",
             "the united states of america",
         ],
-        "text": "Obungus",
-        "delay": 5
+        "text": "barack obama",
+        "delay": 70,
     },
 ];
