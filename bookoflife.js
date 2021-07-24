@@ -263,4 +263,12 @@ const bookoflife = [
         "text": "watermelon squidward",
         "delay": 300
     },
+       {
+        "input": [
+            "human",
+            "the united states of america",
+            ],
+        "text": "Obungus",
+        "delay": 5
+    },
 ];
