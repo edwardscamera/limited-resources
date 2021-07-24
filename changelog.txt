@@ -1,3 +1,6 @@
+v1.2.0 - 7/24/21
+    - added barack obama
+
 v1.1.1 - 7/24/21
     - removed unnecessary code from "script.js"
     - moved some code in "script.js"
